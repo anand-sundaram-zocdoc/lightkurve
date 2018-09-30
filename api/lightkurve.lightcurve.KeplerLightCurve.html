@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerLightCurve &mdash; lightkurve 1.0b14 documentation</title>
+  <title>KeplerLightCurve &mdash; lightkurve 1.0b17 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b14
+                1.0b17
               </div>
             
           
@@ -212,7 +212,7 @@
 <h1>KeplerLightCurve<a class="headerlink" href="#keplerlightcurve" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.lightcurve.KeplerLightCurve">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">KeplerLightCurve</code><span class="sig-paren">(</span><em>time=None</em>, <em>flux=None</em>, <em>flux_err=None</em>, <em>time_format=None</em>, <em>time_scale=None</em>, <em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>quality=None</em>, <em>quality_bitmask=None</em>, <em>channel=None</em>, <em>campaign=None</em>, <em>quarter=None</em>, <em>mission=None</em>, <em>cadenceno=None</em>, <em>keplerid=None</em>, <em>ra=None</em>, <em>dec=None</em>, <em>label=None</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">KeplerLightCurve</code><span class="sig-paren">(</span><em>time=None</em>, <em>flux=None</em>, <em>flux_err=None</em>, <em>time_format=None</em>, <em>time_scale=None</em>, <em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>quality=None</em>, <em>quality_bitmask=None</em>, <em>channel=None</em>, <em>campaign=None</em>, <em>quarter=None</em>, <em>mission=None</em>, <em>cadenceno=None</em>, <em>targetid=None</em>, <em>ra=None</em>, <em>dec=None</em>, <em>label=None</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurve.LightCurve</span></code></a></p>
 <p>Defines a light curve class for NASA’s Kepler and K2 missions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -264,7 +264,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <dt><strong>cadenceno</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
 <dd><p class="first last">Cadence numbers corresponding to every time measurement</p>
 </dd>
-<dt><strong>keplerid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dt><strong>targetid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">Kepler ID number</p>
 </dd>
 </dl>
@@ -282,7 +282,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="lightkurve.lightcurve.KeplerLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></td>
 <td>Returns an <cite>astropy.time.Time</cite> object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.keplerid" title="lightkurve.lightcurve.KeplerLightCurve.keplerid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keplerid</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve.keplerid</span></code></td>
 <td></td>
 </tr>
 </tbody>
@@ -333,7 +333,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.remove_outliers" title="lightkurve.lightcurve.KeplerLightCurve.remove_outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code></a>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="lightkurve.lightcurve.KeplerLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="lightkurve.lightcurve.KeplerLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>([colorbar_label,&nbsp;show_colorbar])</td>
 <td>Plots the light curve using matplotlib’s <cite>scatter</cite> method.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_csv" title="lightkurve.lightcurve.KeplerLightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
@@ -373,11 +373,6 @@ allowed by AstroPy.</p>
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurve.keplerid">
-<code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.keplerid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
@@ -824,7 +819,7 @@ were removed. Entries marked as <cite>True</cite> are considered outliers.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.scatter">
-<code class="descname">scatter</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">scatter</code><span class="sig-paren">(</span><em>colorbar_label=''</em>, <em>show_colorbar=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the light curve using matplotlib’s <cite>scatter</cite> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -851,6 +846,12 @@ a new one will be generated.</p>
 <dd><p class="first last">Path or URL to a matplotlib style file, or name of one of
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
+</dd>
+<dt><strong>colorbar_label</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Label to show next to the colorbar (if <cite>c</cite> is given).</p>
+</dd>
+<dt><strong>show_colorbar</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">Show the colorbar if colors are given using the <cite>c</cite> argument?</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.scatter</cite>.</p>
@@ -1029,7 +1030,7 @@ and <cite>flux_err</cite>.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b14',
+            VERSION:'1.0b17',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

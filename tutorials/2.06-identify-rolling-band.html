@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>How to identify time-variable background noise (“rolling bands”)? &mdash; lightkurve 1.0b14 documentation</title>
+  <title>How to identify time-variable background noise (“rolling bands”)? &mdash; lightkurve 1.0b17 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b14
+                1.0b17
               </div>
             
           
@@ -360,8 +360,8 @@ div.nboutput div.output_area.stderr {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="How-to-identify-time-variable-background-noise-(“rolling-bands”)?">
-<h1>How to identify time-variable background noise (“rolling bands”)?<a class="headerlink" href="#How-to-identify-time-variable-background-noise-(“rolling-bands”)?" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="How-to-identify-time-variable-background-noise-(&quot;rolling-bands&quot;)?">
+<h1>How to identify time-variable background noise (“rolling bands”)?<a class="headerlink" href="#How-to-identify-time-variable-background-noise-("rolling-bands")?" title="Permalink to this headline">¶</a></h1>
 <p>In the previous tutorial we looked at making custom apertures to check
 planet signals. In this tutorial we will use the same technique to find
 variable background (such as rolling band signal) in Kepler data.</p>
@@ -374,7 +374,9 @@ Handbook</a>.
 An example of the rolling band artifact is shown in the video below. You
 can see the band move through the superstamp at the 2 second mark,
 leaving the bottom of the screen at the 6 second mark.</p>
-<p><img alt="image0" src="../_images/rollingband.gif" /></p>
+<div class="figure">
+<img alt="" src="../_images/rollingband.gif" />
+</div>
 <p>The rolling band artifact is small, up to about 20 counts per pixel.
 However, this can add up for large apertures containing many pixels or
 for faint, quiet targets.</p>
@@ -706,7 +708,7 @@ different tutorial.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b14',
+            VERSION:'1.0b17',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b14 documentation</title>
+  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b17 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0b14
+                1.0b17
               </div>
             
           
@@ -739,8 +739,9 @@
 
     <span class="k">def</span> <span class="nf">_create_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;plot&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;lightkurve&#39;</span><span class="p">,</span>
+                     <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorbar_label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Implements both `plot()` and `scatter()` to avoid code duplication.</span>
+        <span class="sd">&quot;&quot;&quot;Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -772,22 +773,34 @@
 
         <span class="c1"># Normalize the data if requested</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
-            <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flux</span>
+            <span class="n">lc_normed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+            <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="n">lc_normed</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">lc_normed</span><span class="o">.</span><span class="n">flux_err</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+            <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span>
 
         <span class="c1"># Make the plot</span>
         <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;scatter&#39;</span><span class="p">:</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="c1"># Colorbars should only be plotted if the user specifies, and there is</span>
+                <span class="c1"># a color specified that is not a string (e.g. &#39;C1&#39;) and is iterable.</span>
+                <span class="k">if</span> <span class="n">show_colorbar</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="ow">and</span> \
+                  <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+                    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+                    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">colorbar_label</span><span class="p">)</span>
+                    <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">tick1On</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tick2On</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">minorticks_off</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;errorbar&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
             <span class="c1"># Show the legend if labels were set</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">legend_labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">legend_labels</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">ax</span>
@@ -822,7 +835,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_plot</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;plot&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LightCurve.scatter"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.scatter">[docs]</a>    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="LightCurve.scatter"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.scatter">[docs]</a>    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar_label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plots the light curve using matplotlib&#39;s `scatter` method.</span>
 
 <span class="sd">        Parameters</span>
@@ -842,6 +855,10 @@
 <span class="sd">            Path or URL to a matplotlib style file, or name of one of</span>
 <span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
 <span class="sd">            Lightkurve&#39;s custom stylesheet is used by default.</span>
+<span class="sd">        colorbar_label : str</span>
+<span class="sd">            Label to show next to the colorbar (if `c` is given).</span>
+<span class="sd">        show_colorbar : boolean</span>
+<span class="sd">            Show the colorbar if colors are given using the `c` argument?</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.</span>
 
@@ -850,7 +867,42 @@
 <span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
 <span class="sd">            The matplotlib axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_plot</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_plot</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="n">colorbar_label</span><span class="o">=</span><span class="n">colorbar_label</span><span class="p">,</span>
+                                 <span class="n">show_colorbar</span><span class="o">=</span><span class="n">show_colorbar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plots the light curve using matplotlib&#39;s `errorbar` method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be generated.</span>
+<span class="sd">        normalize : bool</span>
+<span class="sd">            Normalize the lightcurve before plotting?</span>
+<span class="sd">        xlabel : str</span>
+<span class="sd">            Plot x axis label</span>
+<span class="sd">        ylabel : str</span>
+<span class="sd">            Plot y axis label</span>
+<span class="sd">        title : str</span>
+<span class="sd">            Plot set_title</span>
+<span class="sd">        style : str</span>
+<span class="sd">            Path or URL to a matplotlib style file, or name of one of</span>
+<span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
+<span class="sd">            Lightkurve&#39;s custom stylesheet is used by default.</span>
+<span class="sd">        linestyle : str</span>
+<span class="sd">            Connect the error bars using a line?</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">            The matplotlib axes object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;ls&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;linestyle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">linestyle</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_plot</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;errorbar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LightCurve.to_table"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.to_table">[docs]</a>    <span class="k">def</span> <span class="nf">to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Export the LightCurve as an AstroPy Table.</span>
@@ -1125,16 +1177,16 @@
 <span class="sd">        Mission name</span>
 <span class="sd">    cadenceno : array-like</span>
 <span class="sd">        Cadence numbers corresponding to every time measurement</span>
-<span class="sd">    keplerid : int</span>
+<span class="sd">    targetid : int</span>
 <span class="sd">        Kepler ID number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keplerid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
+                 <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targetid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
                                                <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">,</span>
-                                               <span class="n">targetid</span><span class="o">=</span><span class="n">keplerid</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
+                                               <span class="n">targetid</span><span class="o">=</span><span class="n">targetid</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_col&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_row&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quality&#39;</span><span class="p">)</span>
@@ -1157,20 +1209,7 @@
         <span class="k">return</span> <span class="n">lc</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;kepler&#39;</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(KIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;k2&#39;</span><span class="p">:</span>
-            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(EPIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span>
-
-    <span class="nd">@keplerid</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">))</span>
 
 <div class="viewcode-block" id="KeplerLightCurve.correct"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Corrects a lightcurve for motion-dependent systematic errors.</span>
@@ -1248,8 +1287,8 @@
         <span class="n">kepler_specific_data</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;TELESCOP&#39;</span><span class="p">:</span> <span class="s2">&quot;KEPLER&quot;</span><span class="p">,</span>
             <span class="s1">&#39;INSTRUME&#39;</span><span class="p">:</span> <span class="s2">&quot;Kepler Photometer&quot;</span><span class="p">,</span>
-            <span class="s1">&#39;OBJECT&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">),</span>
-            <span class="s1">&#39;KEPLERID&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">,</span>
+            <span class="s1">&#39;OBJECT&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">),</span>
+            <span class="s1">&#39;KEPLERID&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">,</span>
             <span class="s1">&#39;CHANNEL&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
             <span class="s1">&#39;MISSION&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
             <span class="s1">&#39;RA_OBJ&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ra</span><span class="p">,</span>
@@ -1289,16 +1328,16 @@
 <span class="sd">        Bitmask specifying quality flags of cadences that should be ignored</span>
 <span class="sd">    cadenceno : array-like</span>
 <span class="sd">        Cadence numbers corresponding to every time measurement</span>
-<span class="sd">    ticid : int</span>
+<span class="sd">    targetid : int</span>
 <span class="sd">        Tess Input Catalog ID number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ticid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
+                 <span class="n">targetid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TessLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
                                              <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">,</span>
-                                             <span class="n">targetid</span><span class="o">=</span><span class="n">ticid</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
+                                             <span class="n">targetid</span><span class="o">=</span><span class="n">targetid</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_col&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_row&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quality&#39;</span><span class="p">)</span>
@@ -1321,139 +1360,7 @@
         <span class="k">return</span> <span class="n">lc</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ticid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span>
-
-    <span class="nd">@ticid</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">ticid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">value</span></div>
-
-
-<span class="k">def</span> <span class="nf">iterative_box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-                                <span class="n">nperiods</span><span class="o">=</span><span class="mi">501</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements a routine to find box-like transit events.</span>
-<span class="sd">    This function fits a &quot;box&quot; model defined as:</span>
-
-<span class="sd">    .. math::</span>
-
-<span class="sd">        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)</span>
-
-<span class="sd">    in which :math:`\mathbb{I}` is the indicator function.</span>
-
-<span class="sd">    It turns out that, in a iid Gaussian noise setting, the parameters</span>
-<span class="sd">    :math:`h` and :math:`d`, respectively, the amplitude and the depth</span>
-<span class="sd">    of the box, can be solved analytically.</span>
-
-<span class="sd">    Hence, this function iterates between two procedures:</span>
-<span class="sd">    (i) compute :math:`h` and :math:`d` for given :math:`t_0` and :math:`w`</span>
-<span class="sd">    (ii) numerically optimize for :math:`t_0` and :math:`w` given :math:`h`</span>
-<span class="sd">    and :math:`d`.</span>
-
-<span class="sd">    This procedure is done to a list of `nperiods` periods between `min_period`</span>
-<span class="sd">    and `max_period`. It&#39;s assumed that the best period is the one that</span>
-<span class="sd">    maximizes the posterior probability of the fit.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    lc : LightCurve object</span>
-<span class="sd">        An object from KeplerLightCurve or LightCurve.</span>
-<span class="sd">        Note that flattening the lightcurve beforehand does aid the quest</span>
-<span class="sd">        for the transit period.</span>
-<span class="sd">    min_period : float</span>
-<span class="sd">        Minimum period to search for. Units must be the same as `lc.time`.</span>
-<span class="sd">    max_period : float</span>
-<span class="sd">        Maximum period to search for. Units must be the same as `lc.time`.</span>
-<span class="sd">    nperiods : int</span>
-<span class="sd">        Number of periods to search between `min_period` and `max_period`.</span>
-<span class="sd">    period_scale : str</span>
-<span class="sd">        Type of the scale used to create the grid of periods between `min_period`</span>
-<span class="sd">        and `max_period` used to search for the best period.</span>
-<span class="sd">        Options are `linear`, `log`, or `inverse`.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    log_posterior : list</span>
-<span class="sd">        Log posterior (up to an additive constant) of the fit. The &quot;best&quot;</span>
-<span class="sd">        period is therefore the one that maximizes the log posterior</span>
-<span class="sd">        probability.</span>
-<span class="sd">    trial_periods : numpy array</span>
-<span class="sd">        List of trial periods.</span>
-<span class="sd">    best_period : float</span>
-<span class="sd">        Best period.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This function is experimental. Changes may be made in both its signature</span>
-<span class="sd">    and implementation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-    <span class="n">logprior_to</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=-.</span><span class="mi">5</span><span class="p">,</span> <span class="n">ub</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">logprior_width</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">ub</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">logposterior</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Defines the negative of log of the joint posterior distribution of</span>
-<span class="sd">        the start time of the transit `to` and the transit duration `w`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">to</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">args</span>
-        <span class="n">out_of_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span>
-        <span class="n">in_transit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">out_of_transit</span><span class="p">)</span>
-        <span class="n">ll</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="n">amplitude</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">out_of_transit</span>
-              <span class="o">+</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="p">(</span><span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_transit</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">ll</span><span class="p">)</span> <span class="o">+</span> <span class="n">logprior_to</span><span class="p">(</span><span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="n">logprior_width</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">opt_amplitude</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The MAP estimator for the amplitude of the lightcurve given that</span>
-<span class="sd">        `to` and `w` have joint uniform prior distribution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">width</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">m</span>
-
-    <span class="k">def</span> <span class="nf">opt_depth</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The MAP estimator for the transit depth given that `to` and `w`</span>
-<span class="sd">        have joint uniform prior distribution.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">in_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span><span class="p">)</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">in_transit</span><span class="p">])</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">width</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_period</span><span class="p">,</span> <span class="n">max_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">min_period</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">max_period</span><span class="p">),</span> <span class="n">nperiods</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;inverse&#39;</span><span class="p">:</span>
-        <span class="n">trial_periods</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">max_period</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">min_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;period_scale must be one of </span><span class="si">{}</span><span class="s2">. Got </span><span class="si">{}</span><span class="s2">.&quot;</span>
-                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&#39;linear&#39;, &#39;log&#39;, &#39;inverse&#39;}&quot;</span><span class="p">,</span> <span class="n">period_scale</span><span class="p">))</span>
-
-    <span class="n">log_posterior</span><span class="p">,</span> <span class="n">snr_d</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">trial_periods</span><span class="p">):</span>
-        <span class="n">folded</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
-        <span class="c1"># heuristically define initial guesses for the parameters</span>
-        <span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="mf">1e-4</span>
-        <span class="n">width_star</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]):</span>
-            <span class="n">to_star</span> <span class="o">=</span> <span class="o">.</span><span class="mi">25</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">to_star</span> <span class="o">=</span> <span class="o">-.</span><span class="mi">25</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
-            <span class="c1"># optimize the joint log posterior of to and width</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">logposterior</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">),</span>
-                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span>
-                           <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">)</span>
-            <span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span>
-            <span class="c1"># compute the depth and amplitude using MAP</span>
-            <span class="n">depth_star</span> <span class="o">=</span> <span class="n">opt_depth</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
-            <span class="n">amplitude_star</span> <span class="o">=</span> <span class="n">opt_amplitude</span><span class="p">(</span><span class="n">width_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">)</span>
-        <span class="n">log_posterior</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
-        <span class="n">snr_d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth_star</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">width_star</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">))</span></div>
 </pre></div>
 
            </div>
@@ -1488,7 +1395,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0b14',
+            VERSION:'1.0b17',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

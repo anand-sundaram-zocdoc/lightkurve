@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerTargetPixelFile &mdash; lightkurve 1.0b14 documentation</title>
+  <title>KeplerTargetPixelFile &mdash; lightkurve 1.0b17 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b14
+                1.0b17
               </div>
             
           
@@ -295,7 +295,7 @@ following meaning:</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdu</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keplerid</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.keplerid</span></code></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></td>
@@ -373,8 +373,8 @@ following meaning:</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>([ext])</td>
 <td>Returns the header for a given extension.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([lc])</td>
-<td>Display an interactive IPython Notebook widget to inspect the data.</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([lc,&nbsp;notebook_url,&nbsp;max_cadences])</td>
+<td>Display an interactive Jupyter Notebook widget to inspect the pixel data.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
 <td>Plot a target pixel file at a given frame (index) or cadence number.</td>
@@ -452,11 +452,6 @@ following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">
 <code class="descname">hdu</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid">
-<code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -663,7 +658,7 @@ following meaning:</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position=None</em>, <em>size=(11</em>, <em>11)</em>, <em>extension=None</em>, <em>target_id='unnamed-target'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position=None</em>, <em>size=(11</em>, <em>11)</em>, <em>extension=1</em>, <em>target_id='unnamed-target'</em>, <em>hdu0_keywords={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
@@ -688,6 +683,9 @@ or name to use. Default: 0.</p>
 </dd>
 <dt><strong>target_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or str</span></dt>
 <dd><p class="first last">Unique identifier of the target to be recorded in the TPF.</p>
+</dd>
+<dt><strong>hdu0_keywords</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Additional keywords to add to the first header file.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Extra arguments to be passed to the <cite>KeplerTargetPixelFile</cite> constructor.</p>
@@ -770,16 +768,14 @@ necessary metadata in the tpf object.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display an interactive IPython Notebook widget to inspect the data.</p>
+<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em>, <em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
-unless the user supplies a custom <cite>LightCurve</cite> object.</p>
-<p>This feature requires two optional dependencies:
-- bokeh&gt;=0.12.15
-- ipywidgets&gt;=7.2.0
-These can be installed using e.g. <cite>conda install bokeh ipywidgets</cite>.</p>
-<p>Note: at this time, this feature only works inside an active Jupyter
+unless the user supplies a custom <cite>LightCurve</cite> object.
+This feature requires an optional dependency, bokeh (v0.12.15 or later).
+This dependency can be installed using e.g. <cite>conda install bokeh</cite>.</p>
+<p>At this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -789,6 +785,20 @@ are contained in the TPF (e.g. short cadence data).</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
 <dd><p class="first last">An optional pre-processed lightcurve object to show.</p>
+</dd>
+<dt><strong>notebook_url: str</strong></dt>
+<dd><p class="first last">Location of the Jupyter notebook page (default: “localhost:8888”)
+When showing Bokeh applications, the Bokeh server must be
+explicitly configured to allow connections originating from
+different URLs. This parameter defaults to the standard notebook
+host and port. If you are running on a different location, you
+will need to supply this value for the application to display
+properly. If no protocol is supplied in the URL, e.g. if it is
+of the form “localhost:8888”, then “http” will be used.</p>
+</dd>
+<dt><strong>max_cadences</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Raise a RuntimeError if the number of cadences shown is larger than
+this value. This limit helps keep browsers from becoming unresponsive.</p>
 </dd>
 </dl>
 </td>
@@ -945,7 +955,7 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b14',
+            VERSION:'1.0b17',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

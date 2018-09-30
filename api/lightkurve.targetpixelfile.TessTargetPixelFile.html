@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessTargetPixelFile &mdash; lightkurve 1.0b14 documentation</title>
+  <title>TessTargetPixelFile &mdash; lightkurve 1.0b17 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b14
+                1.0b17
               </div>
             
           
@@ -303,7 +303,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.shape" title="lightkurve.targetpixelfile.TessTargetPixelFile.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></td>
 <td>Return the cube dimension shape.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ticid" title="lightkurve.targetpixelfile.TessTargetPixelFile.ticid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ticid</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile.ticid</span></code></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.time" title="lightkurve.targetpixelfile.TessTargetPixelFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></td>
@@ -333,8 +333,8 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.header" title="lightkurve.targetpixelfile.TessTargetPixelFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>([ext])</td>
 <td>Returns the header for a given extension.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([lc])</td>
-<td>Display an interactive IPython Notebook widget to inspect the data.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([lc,&nbsp;notebook_url,&nbsp;max_cadences])</td>
+<td>Display an interactive Jupyter Notebook widget to inspect the pixel data.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="lightkurve.targetpixelfile.TessTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
 <td>Plot a target pixel file at a given frame (index) or cadence number.</td>
@@ -470,11 +470,6 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="lightkurve.targetpixelfile.TessTargetPixelFile.ticid">
-<code class="descname">ticid</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ticid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.time">
 <code class="descname">time</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the time for all good-quality cadences.</p>
@@ -575,16 +570,14 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display an interactive IPython Notebook widget to inspect the data.</p>
+<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em>, <em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
-unless the user supplies a custom <cite>LightCurve</cite> object.</p>
-<p>This feature requires two optional dependencies:
-- bokeh&gt;=0.12.15
-- ipywidgets&gt;=7.2.0
-These can be installed using e.g. <cite>conda install bokeh ipywidgets</cite>.</p>
-<p>Note: at this time, this feature only works inside an active Jupyter
+unless the user supplies a custom <cite>LightCurve</cite> object.
+This feature requires an optional dependency, bokeh (v0.12.15 or later).
+This dependency can be installed using e.g. <cite>conda install bokeh</cite>.</p>
+<p>At this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -594,6 +587,20 @@ are contained in the TPF (e.g. short cadence data).</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
 <dd><p class="first last">An optional pre-processed lightcurve object to show.</p>
+</dd>
+<dt><strong>notebook_url: str</strong></dt>
+<dd><p class="first last">Location of the Jupyter notebook page (default: “localhost:8888”)
+When showing Bokeh applications, the Bokeh server must be
+explicitly configured to allow connections originating from
+different URLs. This parameter defaults to the standard notebook
+host and port. If you are running on a different location, you
+will need to supply this value for the application to display
+properly. If no protocol is supplied in the URL, e.g. if it is
+of the form “localhost:8888”, then “http” will be used.</p>
+</dd>
+<dt><strong>max_cadences</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Raise a RuntimeError if the number of cadences shown is larger than
+this value. This limit helps keep browsers from becoming unresponsive.</p>
 </dd>
 </dl>
 </td>
@@ -750,7 +757,7 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b14',
+            VERSION:'1.0b17',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
